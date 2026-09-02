@@ -30,8 +30,8 @@ export default function SplashScreen() {
         <div
             aria-hidden="true"
             className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden transition-all duration-1000 ease-in-out ${phase === "exiting"
-                    ? "opacity-0 scale-105 pointer-events-none"
-                    : "opacity-100 scale-100"
+                ? "opacity-0 scale-105 pointer-events-none"
+                : "opacity-100 scale-100"
                 }`}
             style={{ background: "#05050a" }}
         >
@@ -43,7 +43,7 @@ export default function SplashScreen() {
                         width: "600px",
                         height: "600px",
                         background: "radial-gradient(ellipse at center, rgba(196,154,60,0.15) 0%, rgba(168,116,0,0.05) 45%, transparent 70%)",
-                        animation: "glow-pulse 2s ease-in-out infinite",
+                        animation: "glow-pulse 2.2s ease-in-out infinite",
                     }}
                 />
             </div>
@@ -66,7 +66,7 @@ export default function SplashScreen() {
                     className="relative z-10 w-40 h-40 object-contain"
                     style={{
                         filter: "drop-shadow(0 0 24px rgba(196,154,60,0.6))",
-                        animation: "logo-shimmer 2.2s ease-in-out infinite",
+                        animation: "logo-shimmer 2.2s ease-in-out infinite, logo-float-3d 2.2s ease-in-out infinite",
                     }}
                 />
             </div>
@@ -94,6 +94,11 @@ export default function SplashScreen() {
                 @keyframes logo-shimmer {
                     0%,100%{filter:drop-shadow(0 0 20px rgba(196,154,60,.5))}
                     50%{filter:drop-shadow(0 0 45px rgba(255,248,200,.8)) drop-shadow(0 0 65px rgba(196,154,60,.4))}
+                }
+                @keyframes logo-float-3d {
+                    0%, 100% { transform: perspective(800px) rotateY(0deg) translateY(0) scale(1); }
+                    33% { transform: perspective(800px) rotateY(12deg) translateY(-6px) scale(1.04); }
+                    66% { transform: perspective(800px) rotateY(-12deg) translateY(-2px) scale(1.02); }
                 }
                 @keyframes wordmark-rise {
                     from{opacity:0;transform:translateY(12px)}
