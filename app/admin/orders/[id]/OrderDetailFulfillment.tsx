@@ -66,12 +66,11 @@ export default function OrderDetailFulfillment({ initialOrder }: { initialOrder:
                             <h1 className="text-3xl font-heading text-navy font-mono">
                                 {order.orderNumber}
                             </h1>
-                            <span className={`px-2 py-0.5 border text-xs uppercase tracking-wider font-semibold rounded ${
-                                status === "Delivered" ? "bg-cream border-emerald-600 text-emerald-600" :
-                                status === "Processing" ? "bg-cream border-gold text-gold" :
-                                status === "In Transit" ? "bg-cream border-navy text-navy" :
-                                "bg-cream border-red-600 text-red-600"
-                            }`}>
+                            <span className={`px-2 py-0.5 border text-xs uppercase tracking-wider font-semibold rounded ${status === "Delivered" ? "bg-cream border-emerald-600 text-emerald-600" :
+                                    status === "Processing" ? "bg-cream border-gold text-gold" :
+                                        status === "In Transit" ? "bg-cream border-navy text-navy" :
+                                            "bg-cream border-red-600 text-red-600"
+                                }`}>
                                 {order.status}
                             </span>
                         </div>
@@ -170,9 +169,8 @@ export default function OrderDetailFulfillment({ initialOrder }: { initialOrder:
                                 <div className="relative pl-7 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-px before:bg-navy/20">
                                     {order.trackingCheckpoints.map((cp, idx) => (
                                         <div key={idx} className="relative">
-                                            <div className={`absolute -left-7 top-1 w-3 h-3 rounded-full flex items-center justify-center outline outline-4 outline-ivory ${
-                                                cp.completed ? "bg-navy" : cp.current ? "bg-gold" : "bg-navy/20"
-                                            }`} />
+                                            <div className={`absolute -left-7 top-1 w-3 h-3 rounded-full flex items-center justify-center outline outline-4 outline-ivory ${cp.completed ? "bg-navy" : cp.current ? "bg-gold" : "bg-navy/20"
+                                                }`} />
                                             <div>
                                                 <div className="flex items-baseline justify-between">
                                                     <p className="text-sm font-semibold text-navy">{cp.title}</p>
