@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { categories } from "@/data/products";
+import Button from "@/components/ui/Button";
 
 export default function CategoryFilter() {
     const router = useRouter();
@@ -18,26 +19,22 @@ export default function CategoryFilter() {
 
     return (
         <div className="flex flex-wrap gap-2">
-            <button
+            <Button
                 onClick={() => handleFilter(null)}
-                className={`font-body text-sm px-4 py-2 rounded-full border transition-colors ${!activeCategory
-                        ? "bg-navy text-cream border-navy"
-                        : "bg-transparent text-navy border-navy/15 hover:border-gold"
-                    }`}
+                variant={!activeCategory ? "primary" : "outline"}
+                size="sm"
             >
                 All
-            </button>
+            </Button>
             {categories.map((cat) => (
-                <button
+                <Button
                     key={cat.slug}
                     onClick={() => handleFilter(cat.slug)}
-                    className={`font-body text-sm px-4 py-2 rounded-full border transition-colors ${activeCategory === cat.slug
-                            ? "bg-navy text-cream border-navy"
-                            : "bg-transparent text-navy border-navy/15 hover:border-gold"
-                        }`}
+                    variant={activeCategory === cat.slug ? "primary" : "outline"}
+                    size="sm"
                 >
                     {cat.name}
-                </button>
+                </Button>
             ))}
         </div>
     );

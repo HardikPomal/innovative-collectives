@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getProductsByCategory, categories } from "@/data/products";
-import ProductCard from "@/components/product/ProductCard";
+import { categories } from "@/data/products";
 import type { Metadata } from "next";
+import Button from "@/components/ui/Button";
+import CategoryClient from "./CategoryClient";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
@@ -28,8 +29,6 @@ export default async function CategoryPage({
     if (!category) {
         notFound();
     }
-
-    const products = getProductsByCategory(slug);
 
     return (
         <main className="min-h-screen bg-cream pb-20">
@@ -66,29 +65,7 @@ export default async function CategoryPage({
                 </nav>
             </div>
 
-            {/* Product Grid */}
-            <div className="max-w-7xl mx-auto px-4 md:px-6">
-                <div className="flex justify-between items-center mb-8">
-                    <h2 className="font-heading text-2xl text-navy">
-                        Showing {products.length} {products.length === 1 ? 'Product' : 'Products'}
-                    </h2>
-                </div>
-
-                {products.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-                        {products.map((product) => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-center py-24 bg-white rounded-2xl border border-navy/5">
-                        <p className="text-navy/50 font-body text-lg mb-6">No products found in this category.</p>
-                        <Link href="/products" className="inline-block bg-navy text-cream px-8 py-3 rounded-full hover:bg-gold hover:text-navy transition-colors font-body text-sm tracking-wide">
-                            Browse All Products
-                        </Link>
-                    </div>
-                )}
-            </div>
+            <CategoryClient slugPromise={Promise.resolve(slug)} />
         </main>
     );
 }

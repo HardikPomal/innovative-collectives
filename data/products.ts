@@ -73,6 +73,7 @@ export const products: Product[] = [
             },
         ],
     },
+
     {
         id: "2",
         name: "Samsung Galaxy S24 Ultra",
@@ -664,4 +665,15 @@ export function getProductsByCategory(category: string): Product[] {
 
 export function getProductBySlug(slug: string): Product | undefined {
     return products.find((p) => p.slug === slug);
+}
+
+export function searchProducts(query: string): Product[] {
+    const q = query.toLowerCase().trim();
+    if (!q) return [];
+    return products.filter(
+        (p) =>
+            p.name.toLowerCase().includes(q) ||
+            p.brand?.toLowerCase().includes(q) ||
+            p.category.toLowerCase().includes(q)
+    );
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { heroSlides } from "@/data/heroSlides";
+import Button from "@/components/ui/Button";
 import { categoryIcons } from "@/lib/categoryIcons";
 
 const SLIDE_THEMES = [
@@ -160,19 +161,22 @@ export default function HeroBanner() {
                                     transform: textVisible ? "translateY(0)" : "translateY(12px)",
                                     transitionDelay: "180ms",
                                 }}>
-                                <Link href={slide.ctaLink}
-                                    className="group inline-flex items-center gap-2 font-body text-sm font-semibold tracking-wide px-6 py-3 rounded-full transition-all duration-300"
-                                    style={{
-                                        background: `linear-gradient(135deg, ${theme.accent}, #e8c766)`,
-                                        color: "#0b1e3d",
-                                        boxShadow: `0 6px 28px ${theme.accent}45`,
-                                    }}>
+                                <Button
+                                    href={slide.ctaLink}
+                                    variant="secondary"
+                                    icon={<ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />}
+                                    className="group shadow-lg shadow-gold/20"
+                                >
                                     {slide.ctaText}
-                                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                                </Link>
-                                <Link href="/products" className="font-body text-sm text-white/40 hover:text-white/70 transition-colors flex items-center gap-1">
-                                    View All <ArrowRight size={13} />
-                                </Link>
+                                </Button>
+                                <Button
+                                    href="/products"
+                                    variant="ghost"
+                                    className="text-white/40 hover:text-white/70 hover:bg-transparent"
+                                    icon={<ArrowRight size={13} />}
+                                >
+                                    View All
+                                </Button>
                             </div>
                         </div>
 

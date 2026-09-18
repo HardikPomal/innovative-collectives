@@ -1,29 +1,54 @@
+"use client";
+
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { use, useEffect, useState } from "react";
 import { Star, ChevronRight, BadgeCheck } from "lucide-react";
-import { getProductBySlug, getProductsByCategory } from "@/data/products";
+import { getProductBySlug, getProductsByCategory } from "@/lib/db/api";
+import type { Product } from "@/types";
 import { formatPrice, getDiscountPercent } from "@/lib/utils";
 import ProductGallery from "@/components/product/ProductGallery";
 import AddToCart from "@/components/product/AddToCart";
 import ProductGrid from "@/components/product/ProductGrid";
 import ShippingInfo from "@/components/product/ShippingInfo";
 
-export default async function ProductDetailsPage({
+export default function ProductDetailsPage({
     params,
 }: {
     params: Promise<{ slug: string }>;
 }) {
-    const { slug } = await params;
-    const product = getProductBySlug(slug);
+    const { slug } = use(params);
+    const [product, setProduct] = useState<Product | null>(null);
+    const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchProduct() {
+            const p = await getProductBySlug(slug);
+            if (p) {
+                setProduct(p);
+                const related = await getProductsByCategory(p.category);
+                setRelatedProducts(related.filter((r) => r.id !== p.id).slice(0, 4));
+            }
+            setIsLoading(false);
+        }
+        fetchProduct();
+    }, [slug]);
+
+    if (isLoading) {
+        return (
+            <div className="max-w-7xl mx-auto px-4 py-24 text-center">
+                <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="font-heading text-navy">Loading product...</p>
+            </div>
+        );
+    }
 
     if (!product) {
         notFound();
     }
 
     const discount = getDiscountPercent(product.price, product.compareAtPrice);
-    const relatedProducts = getProductsByCategory(product.category)
-        .filter((p) => p.id !== product.id)
-        .slice(0, 4);
 
     return (
         <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10">

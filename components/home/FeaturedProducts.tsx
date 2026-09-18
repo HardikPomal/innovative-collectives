@@ -1,10 +1,32 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { getFeaturedProducts } from "@/data/products";
+import { getProducts } from "@/lib/db/api";
 import ProductCard from "@/components/product/ProductCard";
+import type { Product } from "@/types";
 
 export default function FeaturedProducts() {
-    const featured = getFeaturedProducts();
+    const [featured, setFeatured] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        getProducts().then((products) => {
+            setFeatured(products.filter(p => p.featured));
+            setLoading(false);
+        });
+    }, []);
+
+    if (loading) {
+        return (
+            <section className="bg-cream py-20 min-h-[400px] flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+            </section>
+        );
+    }
+
+    if (featured.length === 0) return null;
 
     return (
         <section className="bg-cream py-20">

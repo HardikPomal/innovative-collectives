@@ -52,6 +52,7 @@ export interface CartItem {
 }
 
 export interface Address {
+    id: string;
     fullName: string;
     phone: string;
     street: string;
@@ -59,4 +60,45 @@ export interface Address {
     state: string;
     postalCode: string;
     country: string;
+    isDefault?: boolean;
+    type?: "shipping" | "billing";
+}
+
+export interface TrackingCheckpoint {
+    title: string;
+    description: string;
+    location: string;
+    timestamp: string;
+    completed: boolean;
+    current?: boolean;
+}
+
+export interface OrderItem {
+    product: Product;
+    quantity: number;
+    price: number;
+}
+
+export type OrderStatus =
+    | "Processing"
+    | "In Transit"
+    | "Delivered"
+    | "Cancelled"
+    | "Returned"
+    | "Refunded";
+
+export interface Order {
+    id: string;
+    orderNumber: string;
+    date: string;
+    status: OrderStatus;
+    items: OrderItem[];
+    subtotal: number;
+    shipping: number;
+    total: number;
+    carrier?: string;
+    trackingNumber?: string;
+    estimatedDelivery?: string;
+    shippingAddress: Address;
+    trackingCheckpoints?: TrackingCheckpoint[];
 }

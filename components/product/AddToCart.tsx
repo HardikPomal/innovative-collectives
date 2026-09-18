@@ -1,10 +1,14 @@
+// components/product/AddToCart.tsx
 "use client";
 
 import { useState } from "react";
-import { Minus, Plus, ShoppingBag } from "lucide-react";
+import { Minus, Plus, ShoppingBag, Check } from "lucide-react";
 import { Product } from "@/types";
+import { useCart } from "@/context/CartContext";
+import Button from "@/components/ui/Button";
 
 export default function AddToCart({ product }: { product: Product }) {
+    const { addItem } = useCart();
     const [quantity, setQuantity] = useState(1);
     const [added, setAdded] = useState(false);
 
@@ -12,13 +16,15 @@ export default function AddToCart({ product }: { product: Product }) {
     const increase = () => setQuantity((q) => q + 1);
 
     const handleAddToCart = () => {
-        // TODO: wire up to real cart state (Context/store) once cart system is built
+        if (!product.inStock) return;
+        addItem(product, quantity);
         setAdded(true);
         setTimeout(() => setAdded(false), 2000);
     };
 
     return (
         <div className="flex flex-col gap-4">
+            {/* Quantity selector */}
             <div className="flex items-center gap-4">
                 <span className="font-body text-sm text-navy/60">Quantity</span>
                 <div className="flex items-center border border-navy/15 rounded-full overflow-hidden">
@@ -42,18 +48,17 @@ export default function AddToCart({ product }: { product: Product }) {
                 </div>
             </div>
 
-            <button
+            {/* Add to cart button */}
+            <Button
                 onClick={handleAddToCart}
                 disabled={!product.inStock}
-                className="flex items-center justify-center gap-2 bg-navy text-cream font-body text-sm font-medium py-3.5 rounded-full hover:bg-navy-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                variant={added ? "secondary" : "primary"}
+                className={`w-full ${added ? "bg-gold text-white border-gold hover:bg-gold/90 hover:text-white" : ""}`}
+                icon={added ? <Check size={18} /> : <ShoppingBag size={18} />}
+                iconPosition="left"
             >
-                <ShoppingBag size={18} />
-                {added
-                    ? "Added to Cart!"
-                    : product.inStock
-                        ? "Add to Cart"
-                        : "Out of Stock"}
-            </button>
+                {added ? "Added to Cart!" : (product.inStock ? "Add to Cart" : "Out of Stock")}
+            </Button>
         </div>
     );
 }

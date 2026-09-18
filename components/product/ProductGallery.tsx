@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X, ZoomIn } from "lucide-react";
 import ProductImage from "./ProductImage";
 
@@ -13,9 +14,63 @@ export default function ProductGallery({
 }) {
     const [activeIndex, setActiveIndex] = useState(0);
     const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (lightboxOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [lightboxOpen]);
 
     const openLightbox = useCallback(() => setLightboxOpen(true), []);
     const closeLightbox = useCallback(() => setLightboxOpen(false), []);
+
+    // Swipe and Drag handlers
+    const [touchStart, setTouchStart] = useState<number | null>(null);
+    const [touchEnd, setTouchEnd] = useState<number | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const minSwipeDistance = 40;
+
+    const onSwipeStart = (e: React.TouchEvent | React.MouseEvent) => {
+        setTouchEnd(null);
+        setTouchStart("touches" in e ? e.targetTouches[0].clientX : (e as React.MouseEvent).clientX);
+        setIsDragging(true);
+    };
+
+    const onSwipeMove = (e: React.TouchEvent | React.MouseEvent) => {
+        if (!isDragging) return;
+        setTouchEnd("touches" in e ? e.targetTouches[0].clientX : (e as React.MouseEvent).clientX);
+    };
+
+    const onSwipeEnd = () => {
+        setIsDragging(false);
+        if (touchStart === null || touchEnd === null) {
+            // No drag occurred, just a click
+            openLightbox();
+            return;
+        }
+
+        const distance = touchStart - touchEnd;
+        if (distance > minSwipeDistance && images.length > 1) {
+            setActiveIndex((i) => (i + 1) % images.length); // Next
+        } else if (distance < -minSwipeDistance && images.length > 1) {
+            setActiveIndex((i) => (i - 1 + images.length) % images.length); // Prev
+        } else if (Math.abs(distance) < 5) {
+            openLightbox(); // Treated as click
+        }
+        
+        setTouchStart(null);
+        setTouchEnd(null);
+    };
 
     return (
         <>
@@ -23,8 +78,17 @@ export default function ProductGallery({
             <div className="flex flex-col gap-3 md:hidden">
                 {/* Main image */}
                 <div
-                    className="relative aspect-square bg-[#F5F3EE] rounded-2xl overflow-hidden cursor-zoom-in group"
-                    onClick={openLightbox}
+                    className="relative aspect-square bg-[#F5F3EE] rounded-2xl overflow-hidden cursor-zoom-in group select-none"
+                    onDragStart={(e) => e.preventDefault()}
+                    onTouchStart={onSwipeStart}
+                    onTouchMove={onSwipeMove}
+                    onTouchEnd={onSwipeEnd}
+                    onMouseDown={onSwipeStart}
+                    onMouseMove={onSwipeMove}
+                    onMouseUp={onSwipeEnd}
+                    onMouseLeave={(e) => {
+                        if (isDragging) onSwipeEnd();
+                    }}
                 >
                     <ProductImage
                         src={images[activeIndex]}
@@ -51,11 +115,10 @@ export default function ProductGallery({
                                 key={i}
                                 onClick={() => setActiveIndex(i)}
                                 aria-label={`Go to image ${i + 1}`}
-                                className={`rounded-full transition-all duration-200 ${
-                                    i === activeIndex
-                                        ? "w-6 h-2 bg-gold"
-                                        : "w-2 h-2 bg-navy/20 hover:bg-navy/40"
-                                }`}
+                                className={`rounded-full transition-all duration-200 ${i === activeIndex
+                                    ? "w-6 h-2 bg-gold"
+                                    : "w-2 h-2 bg-navy/20 hover:bg-navy/40"
+                                    }`}
                             />
                         ))}
                     </div>
@@ -69,11 +132,10 @@ export default function ProductGallery({
                                 key={img}
                                 onClick={() => setActiveIndex(index)}
                                 style={{ background: "#F5F3EE" }}
-                                className={`relative shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
-                                    index === activeIndex
-                                        ? "border-gold shadow-md shadow-gold/20"
-                                        : "border-transparent hover:border-navy/25"
-                                }`}
+                                className={`relative shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 ${index === activeIndex
+                                    ? "border-gold shadow-md shadow-gold/20"
+                                    : "border-transparent hover:border-navy/25"
+                                    }`}
                                 aria-label={`View image ${index + 1}`}
                             >
                                 <ProductImage
@@ -96,16 +158,15 @@ export default function ProductGallery({
             <div className="hidden md:flex gap-3 items-start">
                 {/* Thumbnail strip */}
                 {images.length > 1 && (
-                    <div className="flex flex-col gap-2.5 shrink-0 max-h-[560px] overflow-y-auto pr-0.5 scrollbar-thin">
+                    <div className="flex flex-col gap-2.5 shrink-0 max-h-[560px] overflow-y-auto pr-0.5 pb-1 scrollbar-thin">
                         {images.map((img, index) => (
                             <button
                                 key={img}
                                 onClick={() => setActiveIndex(index)}
-                                className={`relative shrink-0 w-[72px] h-[72px] rounded-xl overflow-hidden border-2 transition-all duration-200 ${
-                                    index === activeIndex
-                                        ? "border-gold shadow-md shadow-gold/20 scale-[1.03]"
-                                        : "border-transparent hover:border-navy/25 hover:scale-[1.02]"
-                                }`}
+                                className={`relative shrink-0 w-[72px] h-[72px] rounded-xl overflow-hidden border-2 transition-all duration-200 ${index === activeIndex
+                                    ? "border-gold shadow-md shadow-gold/20 scale-[1.03]"
+                                    : "border-transparent hover:border-navy/25 hover:scale-[1.02]"
+                                    }`}
                                 style={{ background: "#F5F3EE" }}
                                 aria-label={`View image ${index + 1}`}
                                 aria-pressed={index === activeIndex}
@@ -128,8 +189,17 @@ export default function ProductGallery({
                 {/* Main image */}
                 <div className="relative flex-1 min-w-0">
                     <div
-                        className="relative aspect-square bg-[#F5F3EE] rounded-2xl overflow-hidden cursor-zoom-in group"
-                        onClick={openLightbox}
+                        className="relative aspect-square bg-[#F5F3EE] rounded-2xl overflow-hidden cursor-zoom-in group select-none"
+                        onDragStart={(e) => e.preventDefault()}
+                        onTouchStart={onSwipeStart}
+                        onTouchMove={onSwipeMove}
+                        onTouchEnd={onSwipeEnd}
+                        onMouseDown={onSwipeStart}
+                        onMouseMove={onSwipeMove}
+                        onMouseUp={onSwipeEnd}
+                        onMouseLeave={(e) => {
+                            if (isDragging) onSwipeEnd();
+                        }}
                     >
                         <ProductImage
                             src={images[activeIndex]}
@@ -156,11 +226,10 @@ export default function ProductGallery({
                                     key={i}
                                     onClick={() => setActiveIndex(i)}
                                     aria-label={`Go to image ${i + 1}`}
-                                    className={`rounded-full transition-all duration-200 ${
-                                        i === activeIndex
-                                            ? "w-6 h-2 bg-gold"
-                                            : "w-2 h-2 bg-navy/20 hover:bg-navy/40"
-                                    }`}
+                                    className={`rounded-full transition-all duration-200 ${i === activeIndex
+                                        ? "w-6 h-2 bg-gold"
+                                        : "w-2 h-2 bg-navy/20 hover:bg-navy/40"
+                                        }`}
                                 />
                             ))}
                         </div>
@@ -169,58 +238,75 @@ export default function ProductGallery({
             </div>
 
             {/* ── Lightbox (shared) ───────────────────────────────────────────── */}
-            {lightboxOpen && (
+            {lightboxOpen && mounted && createPortal(
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm"
+                    className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white"
                     onClick={closeLightbox}
                 >
                     <button
                         onClick={closeLightbox}
-                        className="absolute top-4 right-4 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
+                        className="absolute top-6 left-6 text-navy/70 hover:text-navy p-2 transition-colors z-10"
                         aria-label="Close"
                     >
-                        <X size={22} />
+                        <X size={28} strokeWidth={1.5} />
                     </button>
 
-                    {images.length > 1 && (
-                        <>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setActiveIndex((i) => (i - 1 + images.length) % images.length);
-                                }}
-                                className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 md:p-3 text-xl md:text-2xl transition-colors"
-                                aria-label="Previous image"
-                            >
-                                ‹
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setActiveIndex((i) => (i + 1) % images.length);
-                                }}
-                                className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 md:p-3 text-xl md:text-2xl transition-colors"
-                                aria-label="Next image"
-                            >
-                                ›
-                            </button>
-                        </>
-                    )}
-
                     <div
-                        className="relative w-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-3xl aspect-square bg-white/5 rounded-2xl overflow-hidden"
+                        className="relative w-full h-[85vh] flex items-center justify-center"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <ProductImage
                             src={images[activeIndex]}
                             alt={`${productName} — full view ${activeIndex + 1}`}
-                            className="object-contain object-center p-4 md:p-6"
+                            className="object-contain object-center w-full h-full p-4 md:p-8"
                         />
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/60 text-xs font-medium">
-                            {activeIndex + 1} / {images.length}
-                        </div>
+
+                        {images.length > 1 && (
+                            <>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setActiveIndex((i) => (i - 1 + images.length) % images.length);
+                                    }}
+                                    className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 bg-navy text-white hover:bg-navy/90 shadow-md rounded-full p-3 transition-colors"
+                                    aria-label="Previous image"
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setActiveIndex((i) => (i + 1) % images.length);
+                                    }}
+                                    className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 bg-navy text-white hover:bg-navy/90 shadow-md rounded-full p-3 transition-colors"
+                                    aria-label="Next image"
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                                </button>
+                            </>
+                        )}
                     </div>
-                </div>
+
+                    {images.length > 1 && (
+                        <div
+                            className="absolute bottom-8 flex items-center justify-center gap-2"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {images.map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setActiveIndex(i)}
+                                    aria-label={`Go to image ${i + 1}`}
+                                    className={`rounded-full transition-all duration-200 ${i === activeIndex
+                                        ? "w-4 h-1.5 bg-navy/60"
+                                        : "w-1.5 h-1.5 bg-navy/20 hover:bg-navy/40"
+                                        }`}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>,
+                document.body
             )}
         </>
     );

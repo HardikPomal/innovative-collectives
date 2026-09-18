@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Mail, ArrowRight } from "lucide-react";
+import Button from "@/components/ui/Button";
+import TextField from "@/components/ui/TextField";
 
 export default function CTABanner() {
     const [email, setEmail] = useState("");
@@ -41,26 +43,24 @@ export default function CTABanner() {
                         onSubmit={handleSubmit}
                         className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mt-8"
                     >
-                        <div className="relative flex-1">
-                            <Mail
-                                size={16}
-                                className="absolute left-4 top-1/2 -translate-y-1/2 text-navy/40"
-                            />
-                            <input
+                        <div className="flex-1">
+                            <TextField
+                                id="newsletter-email"
                                 type="email"
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Enter your email"
-                                className="w-full font-body text-sm text-navy placeholder:text-navy/40 bg-white rounded-full pl-11 pr-4 py-3 outline-none focus:ring-2 focus:ring-navy/20"
+                                icon={<Mail size={16} />}
                             />
                         </div>
-                        <button
+                        <Button
                             type="submit"
-                            className="flex items-center justify-center gap-2 bg-navy text-cream font-body text-sm font-medium px-6 py-3 rounded-full hover:bg-navy-light transition-colors whitespace-nowrap"
+                            variant="primary"
+                            icon={<ArrowRight size={16} />}
                         >
-                            Subscribe <ArrowRight size={16} />
-                        </button>
+                            Subscribe
+                        </Button>
                     </form>
                 )}
             </div>

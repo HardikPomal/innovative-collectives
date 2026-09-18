@@ -1,19 +1,31 @@
+// components/product/QuickAddButton.tsx
 "use client";
 
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, Check } from "lucide-react";
+import { useState } from "react";
+import { Product } from "@/types";
+import { useCart } from "@/context/CartContext";
 
-export default function QuickAddButton() {
+export default function QuickAddButton({ product }: { product: Product }) {
+    const { addItem } = useCart();
+    const [justAdded, setJustAdded] = useState(false);
+
     return (
         <button
             aria-label="Quick add to cart"
             onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                // TODO: wire up to real cart logic once cart state is built
+                addItem(product, 1);
+                setJustAdded(true);
+                setTimeout(() => setJustAdded(false), 1500);
             }}
-            className="w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center text-navy hover:bg-gold transition-colors"
+            className={`w-10 h-10 rounded-full shadow-lg flex items-center justify-center transition-colors ${justAdded
+                    ? "bg-gold text-white"
+                    : "bg-white text-navy hover:bg-gold hover:text-white"
+                }`}
         >
-            <ShoppingBag size={16} />
+            {justAdded ? <Check size={16} /> : <ShoppingBag size={16} />}
         </button>
     );
 }
