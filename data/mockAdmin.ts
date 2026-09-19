@@ -13,7 +13,6 @@ export interface AdminCustomer {
     joinedDate: string;
     status: "Active" | "Inactive";
     lastActive: string;
-    notes?: string;
 }
 
 export interface StoreSettings {
@@ -48,7 +47,6 @@ export const mockCustomers: AdminCustomer[] = [
         joinedDate: "2025-04-12",
         status: "Active",
         lastActive: "Today, 10:20 AM",
-        notes: "Preferred white-glove Manhattan courier deliveries.",
     },
     {
         id: "cust_2",
@@ -62,7 +60,6 @@ export const mockCustomers: AdminCustomer[] = [
         joinedDate: "2025-06-18",
         status: "Active",
         lastActive: "Yesterday",
-        notes: "Watches collector. Prefers discreet packaging.",
     },
     {
         id: "cust_3",
@@ -76,7 +73,6 @@ export const mockCustomers: AdminCustomer[] = [
         joinedDate: "2025-09-03",
         status: "Active",
         lastActive: "3 days ago",
-        notes: "Prefers expedited air transit via Heathrow Hub.",
     },
     {
         id: "cust_4",
@@ -90,7 +86,6 @@ export const mockCustomers: AdminCustomer[] = [
         joinedDate: "2025-11-20",
         status: "Active",
         lastActive: "Sep 12, 2026",
-        notes: "Frequent buyer of leather bags and tech flagships.",
     },
     {
         id: "cust_5",

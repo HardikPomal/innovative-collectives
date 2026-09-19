@@ -18,15 +18,7 @@ const STATUS_TABS: { id: string; label: string }[] = [
     { id: "Cancelled", label: "Cancelled" },
 ];
 
-function statusStyle(status: string) {
-    switch (status) {
-        case "Delivered": return "text-emerald-600 font-medium";
-        case "In Transit": return "text-navy font-medium";
-        case "Processing": return "text-gold font-medium";
-        case "Cancelled": return "text-red-600 font-medium";
-        default: return "text-navy/60";
-    }
-}
+import Badge from "@/components/ui/Badge";
 
 export default function AdminOrdersPage() {
 
@@ -77,7 +69,7 @@ export default function AdminOrdersPage() {
             </div>
 
             {/* Status Tabs */}
-            <div className="flex items-center gap-2 border-b border-navy/10 overflow-x-auto">
+            <div className="flex items-center gap-2 border-b border-navy/10 overflow-x-auto overflow-y-hidden">
                 {STATUS_TABS.map((tab) => (
                     <button
                         key={tab.id}
@@ -98,10 +90,10 @@ export default function AdminOrdersPage() {
                 ))}
             </div>
 
-            {/* Toolbar and Table Wrapper */}
-            <div>
+            {/* Orders Table Card */}
+            <div className="bg-ivory border border-navy/10 shadow-sm rounded-2xl overflow-hidden">
                 {/* Search Toolbar */}
-                <div className="bg-ivory border border-navy/10 shadow-sm p-5 rounded-t-2xl">
+                <div className="p-5 border-b border-navy/10">
                     <div className="max-w-md">
                         <TextField
                             id="search"
@@ -113,8 +105,7 @@ export default function AdminOrdersPage() {
                     </div>
                 </div>
 
-                {/* Orders Table */}
-                <div className="bg-ivory border border-navy/10 shadow-sm overflow-hidden rounded-b-2xl border-t-0">
+                {/* Table */}
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                         <thead>
@@ -181,9 +172,7 @@ export default function AdminOrdersPage() {
                                                 {new Date(order.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
                                             </td>
                                             <td className="py-4 px-5">
-                                                <span className={`text-xs uppercase tracking-wider ${statusStyle(order.status)}`}>
-                                                    {order.status}
-                                                </span>
+                                                <Badge status={order.status} />
                                             </td>
                                             <td className="py-4 px-5">
                                                 {order.trackingNumber ? (
@@ -219,7 +208,6 @@ export default function AdminOrdersPage() {
                     totalPages={totalPages}
                     onPageChange={setCurrentPage}
                 />
-            </div>
             </div>
         </div>
     );

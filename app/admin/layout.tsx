@@ -9,7 +9,6 @@ import {
     Package,
     ShoppingBag,
     Users,
-    Settings,
     ExternalLink,
     Menu,
     X,
@@ -31,7 +30,6 @@ const navItems: NavItem[] = [
     { label: "Products", href: "/admin/products", icon: Package },
     { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
     { label: "Customers", href: "/admin/customers", icon: Users },
-    { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

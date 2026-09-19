@@ -11,6 +11,7 @@ import type { Product, CategorySlug } from "@/types";
 import Button from "@/components/ui/Button";
 import TextField from "@/components/ui/TextField";
 import FeaturedLimitModal from "@/components/admin/FeaturedLimitModal";
+import DeleteImageModal from "@/components/admin/DeleteImageModal";
 
 export default function ProductEditForm({ product }: { product: Product }) {
     const [name, setName] = useState(product.name);
@@ -33,6 +34,7 @@ export default function ProductEditForm({ product }: { product: Product }) {
 
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
+    const [deleteImageIndex, setDeleteImageIndex] = useState<number | null>(null);
 
     useEffect(() => {
         getProducts().then(products => {
@@ -239,8 +241,17 @@ export default function ProductEditForm({ product }: { product: Product }) {
                                 </select>
                             </div>
                             <div>
-                                <label className={labelCls}>SKU</label>
-                                <TextField id="sku" value={sku} onChange={(e) => setSku(e.target.value)} inputClassName="font-mono text-xs" />
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className="text-xs font-semibold text-navy/70 uppercase tracking-wider">SKU</label>
+                                    <span className="text-[10px] text-navy/40 font-mono">System generated</span>
+                                </div>
+                                <TextField
+                                    id="sku"
+                                    value={sku}
+                                    disabled
+                                    readOnly
+                                    inputClassName="font-mono text-xs"
+                                />
                             </div>
                             <div className="flex items-center justify-between pt-4 border-t border-navy/10">
                                 <div>
@@ -334,8 +345,12 @@ export default function ProductEditForm({ product }: { product: Product }) {
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={() => removeImage(i)}
-                                                className="absolute top-1.5 right-1.5 p-1.5 bg-ivory text-red-600 rounded-md opacity-0 group-hover:opacity-100 shadow-sm transition-opacity"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setDeleteImageIndex(i);
+                                                }}
+                                                className="absolute top-1.5 right-1.5 p-1.5 bg-ivory text-red-600 rounded-md opacity-0 group-hover:opacity-100 shadow-sm transition-opacity hover:bg-red-50"
+                                                title="Delete image"
                                             >
                                                 <Trash2 size={14} />
                                             </button>
@@ -360,6 +375,20 @@ export default function ProductEditForm({ product }: { product: Product }) {
                 initialIndex={lightboxIndex}
                 isOpen={lightboxOpen}
                 onClose={() => setLightboxOpen(false)}
+            />
+
+            <DeleteImageModal
+                isOpen={deleteImageIndex !== null}
+                onClose={() => setDeleteImageIndex(null)}
+                onConfirm={() => {
+                    if (deleteImageIndex !== null) {
+                        removeImage(deleteImageIndex);
+                        setDeleteImageIndex(null);
+                    }
+                }}
+                imageUrl={deleteImageIndex !== null ? imageUrls[deleteImageIndex] : null}
+                imageIndex={deleteImageIndex}
+                isMain={deleteImageIndex === 0}
             />
         </div>
     );

@@ -11,6 +11,7 @@ import type { CategorySlug, Product } from "@/types";
 import Button from "@/components/ui/Button";
 import TextField from "@/components/ui/TextField";
 import FeaturedLimitModal from "@/components/admin/FeaturedLimitModal";
+import DeleteImageModal from "@/components/admin/DeleteImageModal";
 import ImageLightbox from "@/components/ui/ImageLightbox";
 
 export default function AddProductPage() {
@@ -38,13 +39,32 @@ export default function AddProductPage() {
     const [showLimitModal, setShowLimitModal] = useState(false);
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
+    const [deleteImageIndex, setDeleteImageIndex] = useState<number | null>(null);
 
-    // Fetch initial featured count
+    const [allProducts, setAllProducts] = useState<Product[]>([]);
+
+    function generateSKU(cat: CategorySlug, productsList: Product[] = []) {
+        const prefixes: Record<string, string> = {
+            mobiles: "MOB",
+            bags: "BAG",
+            wallets: "WAL",
+            watches: "WAT",
+            perfumes: "PER",
+            sunglasses: "SUN",
+        };
+        const prefix = prefixes[cat] || cat.substring(0, 3).toUpperCase();
+        const count = productsList.filter(p => p.category === cat).length + 1;
+        return `IC-${prefix}-${String(count).padStart(4, "0")}`;
+    }
+
+    // Fetch initial featured count and generate SKU
     useEffect(() => {
         getProducts().then(products => {
+            setAllProducts(products);
             const featuredList = products.filter(p => p.featured);
             setFeaturedProducts(featuredList);
             setFeaturedCount(featuredList.length);
+            setSku(generateSKU(category, products));
         });
     }, []);
 
@@ -296,7 +316,11 @@ export default function AddProductPage() {
                                 <p className="text-[11px] text-navy/50 mb-2 leading-tight">Select where this item belongs in your store's navigation.</p>
                                 <select
                                     value={category}
-                                    onChange={(e) => setCategory(e.target.value as CategorySlug)}
+                                    onChange={(e) => {
+                                        const newCat = e.target.value as CategorySlug;
+                                        setCategory(newCat);
+                                        setSku(generateSKU(newCat, allProducts));
+                                    }}
                                     className={inputCls}
                                 >
                                     {categories.map((c) => (
@@ -305,13 +329,15 @@ export default function AddProductPage() {
                                 </select>
                             </div>
                             <div>
-                                <label className={labelCls}>SKU (Optional)</label>
-                                <p className="text-[11px] text-navy/50 mb-2 leading-tight">Stock Keeping Unit. A unique identifier for tracking your inventory.</p>
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className="text-xs font-semibold text-navy/70 uppercase tracking-wider">SKU</label>
+                                    <span className="text-[10px] text-navy/40 font-mono">System generated</span>
+                                </div>
                                 <TextField
                                     id="sku"
                                     value={sku}
-                                    onChange={(e) => setSku(e.target.value)}
-                                    placeholder="IC-LXW-0099"
+                                    disabled
+                                    readOnly
                                     inputClassName="font-mono text-xs"
                                 />
                             </div>
@@ -423,8 +449,12 @@ export default function AddProductPage() {
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={() => removeImage(i)}
-                                                className="absolute top-1.5 right-1.5 p-1.5 bg-ivory text-red-600 rounded-md opacity-0 group-hover:opacity-100 shadow-sm transition-opacity"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setDeleteImageIndex(i);
+                                                }}
+                                                className="absolute top-1.5 right-1.5 p-1.5 bg-ivory text-red-600 rounded-md opacity-0 group-hover:opacity-100 shadow-sm transition-opacity hover:bg-red-50"
+                                                title="Delete image"
                                             >
                                                 <Trash2 size={14} />
                                             </button>
@@ -442,6 +472,20 @@ export default function AddProductPage() {
                 initialIndex={lightboxIndex}
                 isOpen={lightboxOpen}
                 onClose={() => setLightboxOpen(false)}
+            />
+
+            <DeleteImageModal
+                isOpen={deleteImageIndex !== null}
+                onClose={() => setDeleteImageIndex(null)}
+                onConfirm={() => {
+                    if (deleteImageIndex !== null) {
+                        removeImage(deleteImageIndex);
+                        setDeleteImageIndex(null);
+                    }
+                }}
+                imageUrl={deleteImageIndex !== null ? imageUrls[deleteImageIndex] : null}
+                imageIndex={deleteImageIndex}
+                isMain={deleteImageIndex === 0}
             />
         </div>
     );

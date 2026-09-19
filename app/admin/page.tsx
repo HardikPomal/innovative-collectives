@@ -11,7 +11,6 @@ import {
     Plus,
     AlertTriangle,
     Users,
-    Settings,
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { formatPrice } from "@/lib/utils";
@@ -19,20 +18,7 @@ import { categories } from "@/data/products";
 import { getOrders, getProducts } from "@/lib/db/api";
 import type { Order, Product } from "@/types";
 
-function getStatusStyle(status: string) {
-    switch (status) {
-        case "Delivered":
-            return "text-emerald-600 font-medium";
-        case "In Transit":
-            return "text-navy font-medium";
-        case "Processing":
-            return "text-gold font-medium";
-        case "Cancelled":
-            return "text-red-600 font-medium";
-        default:
-            return "text-navy/60";
-    }
-}
+import StatusBadge from "@/components/admin/StatusBadge";
 
 export default function AdminDashboardPage() {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -95,7 +81,7 @@ export default function AdminDashboardPage() {
                     },
                     {
                         label: "Total Orders",
-                        value: orders.length.toLocaleString(),
+                        value: `${orders.length.toLocaleString()} Orders`,
                         sub: `${orders.filter(o => o.status === "Processing").length} pending dispatch`,
                         icon: ShoppingBag,
                     },
@@ -119,7 +105,7 @@ export default function AdminDashboardPage() {
                             className="bg-navy p-6 rounded-2xl shadow-sm"
                         >
                             <div className="flex items-center justify-between mb-4">
-                                <span className="text-xs uppercase tracking-wider text-cream/60 font-semibold">
+                                <span className="text-xs text-cream/60">
                                     {card.label}
                                 </span>
                                 <Icon size={18} className="text-gold" />
@@ -214,9 +200,7 @@ export default function AdminDashboardPage() {
                                                 {new Date(order.date).toLocaleDateString()}
                                             </td>
                                             <td className="py-4 px-6">
-                                                <span className={`text-xs uppercase tracking-wider ${getStatusStyle(order.status)}`}>
-                                                    {order.status}
-                                                </span>
+                                                <StatusBadge status={order.status} />
                                             </td>
                                             <td className="py-4 px-6 text-right font-medium text-navy">
                                                 {formatPrice(order.total)}

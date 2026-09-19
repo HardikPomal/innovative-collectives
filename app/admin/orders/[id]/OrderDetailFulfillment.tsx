@@ -6,6 +6,7 @@ import { ArrowLeft, Check, User, MapPin, CreditCard, Save } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { updateOrder } from "@/lib/db/api";
 import type { Order, OrderStatus } from "@/types";
+import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 
 function statusStyle(status: string) {
@@ -21,7 +22,7 @@ function statusStyle(status: string) {
 export default function OrderDetailFulfillment({ initialOrder }: { initialOrder: Order }) {
     const [order, setOrder] = useState<Order>(initialOrder);
     const [status, setStatus] = useState<OrderStatus>(initialOrder.status);
-    const [notes, setNotes] = useState("Order allocated to white-glove dispatch. Serial provenance verified.");
+    const [notes, setNotes] = useState("");
     const [saved, setSaved] = useState(false);
     const [notesSaved, setNotesSaved] = useState(false);
 
@@ -66,13 +67,7 @@ export default function OrderDetailFulfillment({ initialOrder }: { initialOrder:
                             <h1 className="text-3xl font-heading text-navy font-mono">
                                 {order.orderNumber}
                             </h1>
-                            <span className={`px-2 py-0.5 border text-xs uppercase tracking-wider font-semibold rounded ${status === "Delivered" ? "bg-cream border-emerald-600 text-emerald-600" :
-                                    status === "Processing" ? "bg-cream border-gold text-gold" :
-                                        status === "In Transit" ? "bg-cream border-navy text-navy" :
-                                            "bg-cream border-red-600 text-red-600"
-                                }`}>
-                                {order.status}
-                            </span>
+                            <Badge status={status} />
                         </div>
                         <p className="text-sm text-navy/70 mt-1">
                             Placed on {new Date(order.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })} · Tracking: {order.trackingNumber || "Pending"}

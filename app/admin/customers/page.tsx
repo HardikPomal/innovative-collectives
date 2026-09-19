@@ -8,6 +8,7 @@ import { formatPrice } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import TextField from "@/components/ui/TextField";
 import Pagination from "@/components/ui/Pagination";
+import Badge from "@/components/ui/Badge";
 
 function initials(name: string) {
     return name.split(" ").map((n) => n[0]).join("").slice(0, 2);
@@ -56,21 +57,22 @@ export default function AdminCustomersPage() {
                 </p>
             </div>
 
-            {/* Search */}
-            <div className="bg-ivory border border-navy/10 shadow-sm p-5 rounded-t-2xl">
-                <div className="max-w-md">
-                    <TextField
-                        id="search"
-                        value={searchQuery}
-                        onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                        placeholder="Search by name, email, or city..."
-                        icon={<Search size={16} />}
-                    />
+            {/* Table Card */}
+            <div className="bg-ivory border border-navy/10 shadow-sm rounded-2xl overflow-hidden">
+                {/* Search */}
+                <div className="p-5 border-b border-navy/10">
+                    <div className="max-w-md">
+                        <TextField
+                            id="search"
+                            value={searchQuery}
+                            onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                            placeholder="Search by name, email, or city..."
+                            icon={<Search size={16} />}
+                        />
+                    </div>
                 </div>
-            </div>
 
-            {/* Table */}
-            <div className="bg-ivory border border-navy/10 shadow-sm overflow-hidden rounded-b-2xl border-t-0">
+                {/* Table */}
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                         <thead>
@@ -132,13 +134,7 @@ export default function AdminCustomersPage() {
                                             {cust.joinedDate}
                                         </td>
                                         <td className="py-4 px-5">
-                                            <span className={`px-2 py-0.5 border text-xs uppercase tracking-wider font-semibold rounded ${
-                                                cust.status === "Active"
-                                                    ? "bg-cream border-emerald-600 text-emerald-600"
-                                                    : "bg-cream border-navy/30 text-navy/70"
-                                            }`}>
-                                                {cust.status}
-                                            </span>
+                                            <Badge status={cust.status} />
                                         </td>
                                         <td className="py-4 px-5 text-right">
                                             <Button
@@ -185,13 +181,9 @@ export default function AdminCustomersPage() {
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-heading text-navy">{selected.name}</h3>
-                                    <span className={`inline-block mt-2 px-2 py-0.5 border text-xs uppercase tracking-wider font-semibold rounded ${
-                                        selected.status === "Active"
-                                            ? "bg-cream border-emerald-600 text-emerald-600"
-                                            : "bg-cream border-navy/30 text-navy/70"
-                                    }`}>
-                                        {selected.status}
-                                    </span>
+                                    <div className="mt-2">
+                                        <Badge status={selected.status} />
+                                    </div>
                                 </div>
                             </div>
 
@@ -228,13 +220,6 @@ export default function AdminCustomersPage() {
                                 </div>
                             </div>
 
-                            {/* Notes */}
-                            {selected.notes && (
-                                <div className="bg-ivory border-l-2 border-gold p-5 shadow-sm rounded-r-lg">
-                                    <p className="text-[10px] uppercase tracking-wider text-navy/60 font-semibold mb-2">Notes</p>
-                                    <p className="text-sm text-navy leading-relaxed">{selected.notes}</p>
-                                </div>
-                            )}
 
                             <Button
                                 onClick={() => setSelected(null)}

@@ -10,6 +10,7 @@ import type { Product } from "@/types";
 import Button from "@/components/ui/Button";
 import TextField from "@/components/ui/TextField";
 import Pagination from "@/components/ui/Pagination";
+import Badge from "@/components/ui/Badge";
 
 export default function AdminProductsPage() {
     const [productsList, setProductsList] = useState<Product[]>([]);
@@ -93,50 +94,60 @@ export default function AdminProductsPage() {
                 </Button>
             </div>
 
-            {/* Toolbar */}
-            <div className="bg-ivory border border-navy/10 p-5 flex flex-col md:flex-row gap-4 shadow-sm rounded-2xl items-start md:items-center">
-                <div className="flex-1 min-w-0 w-full">
-                    <TextField
-                        id="search"
-                        value={searchQuery}
-                        onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                        placeholder="Search by name, brand, or SKU..."
-                        icon={<Search size={16} />}
-                    />
-                </div>
-                <div className="flex flex-wrap sm:flex-nowrap gap-3 w-full md:w-auto">
-                    <select
-                        value={selectedCategory}
-                        onChange={(e) => { setSelectedCategory(e.target.value); setCurrentPage(1); }}
-                        className="flex-1 sm:flex-none px-4 py-2.5 border border-navy/20 rounded-lg text-sm text-navy focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold bg-ivory transition-colors"
-                    >
-                        <option value="all">All Categories</option>
-                        {categories.map((c) => (
-                            <option key={c.slug} value={c.slug}>{c.name}</option>
-                        ))}
-                    </select>
-                    <select
-                        value={selectedStock}
-                        onChange={(e) => { setSelectedStock(e.target.value); setCurrentPage(1); }}
-                        className="flex-1 sm:flex-none px-4 py-2.5 border border-navy/20 rounded-lg text-sm text-navy focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold bg-ivory transition-colors"
-                    >
-                        <option value="all">All Status</option>
-                        <option value="in-stock">In Stock</option>
-                        <option value="out-of-stock">Out of Stock</option>
-                    </select>
-                    <button
-                        onClick={() => { setShowFeaturedOnly(!showFeaturedOnly); setCurrentPage(1); }}
-                        title="Filter by featured products"
-                        className={`flex items-center justify-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-medium transition-colors shrink-0 ${showFeaturedOnly ? "border-gold bg-gold/10 text-gold" : "border-navy/20 bg-ivory text-navy hover:border-gold hover:text-gold"}`}
-                    >
-                        <span className={`w-2 h-2 rounded-full ${showFeaturedOnly ? "bg-gold" : "bg-transparent border border-navy/40"}`} />
-                        Featured
-                    </button>
-                </div>
-            </div>
-
-            {/* Table */}
+            {/* Table Card */}
             <div className="bg-ivory border border-navy/10 shadow-sm rounded-2xl overflow-hidden">
+                {/* Toolbar */}
+                <div className="p-5 border-b border-navy/10 flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <div className="flex-1 min-w-0 w-full">
+                        <TextField
+                            id="search"
+                            value={searchQuery}
+                            onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                            placeholder="Search by name, brand, or SKU..."
+                            icon={<Search size={16} />}
+                        />
+                    </div>
+                    <div className="flex flex-wrap sm:flex-nowrap gap-3 w-full md:w-auto">
+                        <select
+                            value={selectedCategory}
+                            onChange={(e) => { setSelectedCategory(e.target.value); setCurrentPage(1); }}
+                            className="flex-1 sm:flex-none px-4 py-2.5 border border-navy/20 rounded-lg text-sm text-navy focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold bg-ivory transition-colors"
+                        >
+                            <option value="all">All Categories</option>
+                            {categories.map((c) => (
+                                <option key={c.slug} value={c.slug}>{c.name}</option>
+                            ))}
+                        </select>
+                        <select
+                            value={selectedStock}
+                            onChange={(e) => { setSelectedStock(e.target.value); setCurrentPage(1); }}
+                            className="flex-1 sm:flex-none px-4 py-2.5 border border-navy/20 rounded-lg text-sm text-navy focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold bg-ivory transition-colors"
+                        >
+                            <option value="all">All Status</option>
+                            <option value="in-stock">In Stock</option>
+                            <option value="out-of-stock">Out of Stock</option>
+                        </select>
+                        <button
+                            type="button"
+                            onClick={() => { setShowFeaturedOnly(!showFeaturedOnly); setCurrentPage(1); }}
+                            title="Filter by featured products"
+                            className={`flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-medium transition-colors shrink-0 cursor-pointer`}
+                        >
+                            <span
+                                className={`w-8 h-[18px] rounded-full relative transition-colors duration-200 ease-in-out shrink-0 ${showFeaturedOnly ? "bg-gold" : "bg-navy/20"
+                                    }`}
+                            >
+                                <span
+                                    className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-ivory shadow-xs transition-all duration-200 ease-in-out ${showFeaturedOnly ? "left-[16px]" : "left-[2px]"
+                                        }`}
+                                />
+                            </span>
+                            <span>Featured</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Table */}
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                         <thead>
@@ -215,17 +226,7 @@ export default function AdminProductsPage() {
                                                 )}
                                             </td>
                                             <td className="py-4 px-5">
-                                                {product.inStock ? (
-                                                    <span className="text-xs font-semibold uppercase tracking-wider text-navy flex items-center gap-1.5">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                                        In Stock
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-xs font-semibold uppercase tracking-wider text-red-600 flex items-center gap-1.5">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-red-600" />
-                                                        Out of Stock
-                                                    </span>
-                                                )}
+                                                <Badge status={product.inStock ? "In Stock" : "Out of Stock"} />
                                             </td>
                                             <td className="py-4 px-5 text-right">
                                                 <div className="flex items-center justify-end gap-4">
@@ -260,7 +261,7 @@ export default function AdminProductsPage() {
                         </tbody>
                     </table>
                 </div>
-                <Pagination 
+                <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={setCurrentPage}
