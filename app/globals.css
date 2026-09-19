@@ -1,3 +1,4 @@
+
 @import "tailwindcss";
 
 @theme inline {
@@ -5,16 +6,17 @@
   --color-navy-light: #1B3A63;
   --color-gold: #C9A227;
   --color-gold-light: #E8C766;
-  --color-cream: #FAF8F3;
+  --color-cream: #f0f1f7;
   --color-ivory: #FFFFFF;
 
   --font-heading: var(--font-playfair);
-  --font-body: var(--font-inter);
+  --font-body: "Inter", sans-serif;
 }
 
 body {
   background-color: var(--color-ivory);
   color: var(--color-navy);
+  font-feature-settings: "cv02" 1, "cv03" 1, "cv04" 1, "cv11" 1;
 }
 
 @keyframes marquee {
