@@ -29,11 +29,10 @@ export default function SplashScreen() {
     return (
         <div
             aria-hidden="true"
-            className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden transition-all duration-1000 ease-in-out ${phase === "exiting"
+            className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden transition-all duration-1000 ease-in-out bg-navy ${phase === "exiting"
                 ? "opacity-0 scale-105 pointer-events-none"
                 : "opacity-100 scale-100"
                 }`}
-            style={{ background: "#05050a" }}
         >
             {/* ── Ambient radial glow ── */}
             <div className="absolute inset-0 pointer-events-none">
